@@ -5,14 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 public class Partation {
-    private Map<Long, Vertex> vertices;
-    private Map<Long, Map<Long, Long>> cost;
+    private Map<Long, Vertex> vertices = new HashMap<>();
+    private Map<Long, Map<Long, Long>> cost = new HashMap<>();
 
     public boolean contains(Long vertex_id){
+        System.out.println(vertices);
         return vertices.containsKey(vertex_id);
     }
     public void addVertex(Long id, boolean isBridge, List<Long> otherHosts){
         Vertex vertex = new Vertex(id, isBridge, otherHosts);
+        vertices.put(id, vertex);
     }
     public void addEdge(Long src, Long dst, Long weight){
         vertices.get(src).addEdge(dst, weight);
