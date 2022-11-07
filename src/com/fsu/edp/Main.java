@@ -1,5 +1,6 @@
 package com.fsu.edp;
 
+import com.fsu.edp.engine.Engine;
 import com.fsu.edp.model.Index;
 import com.fsu.edp.model.Partation;
 
@@ -11,69 +12,47 @@ import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
-        String fileName = "data/data.txt";
-        Long numOfLabels = 5L;
-        Index index = new Index();
-        for (Long i = 0L; i < numOfLabels; ++i) {
-            index.createPartition(i);
-        }
-        Map<Long, Set<Long>> otherHostsMap = new HashMap<>();
-        List<Long> src = new ArrayList<>();
-        List<Long> dst = new ArrayList<>();
-        List<Long> weight = new ArrayList<>();
-        List<Long> label = new ArrayList<>();
+        String fileName = args[0];
+        Long numOfLabels = Long.valueOf(args[1]);
+        Long numOfVertices = Long.valueOf(args[2]);
+        Long numOfQueries = 100L;
 
-        try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
-            stream.forEach(e -> {
-                String[] data = e.split(" ");
-                src.add(Long.valueOf(data[0]));
-                dst.add(Long.valueOf(data[1]));
-                weight.add(Long.valueOf(data[2]));
-                label.add(Long.valueOf(data[3]));
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < src.size(); i++) {
-            if (!otherHostsMap.containsKey(src.get(i))) {
-                Set<Long> hostMap = new HashSet<>();
-                otherHostsMap.put(src.get(i), hostMap);
-            }
-            otherHostsMap.get(src.get(i)).add(label.get(i));
-        }
-        System.out.println(otherHostsMap);
-        System.out.println("First Scan completed");
-        for (int i = 0; i < src.size(); i++) {
-            Partation par = index.getPartition(label.get(i));
-            Long cur_src = src.get(i);
-            Long cur_dst = dst.get(i);
-            Long cur_label = label.get(i);
-            if (!par.contains(cur_src)) {
-                addVertex(par, cur_src, cur_label, otherHostsMap);
-            }
-            if (!par.contains(cur_dst)) {
-                addVertex(par, cur_dst, cur_label, otherHostsMap);
-            }
-            System.out.println(par);
-        }
-    }
+        Random rand = new Random();
 
-    private static void addVertex(Partation par, Long src, Long label, Map<Long, Set<Long>> otherHostsMap) {
-        boolean bridge = false;
-        List<Long> otherHost = new ArrayList<>();
-        for (Long labelKey : otherHostsMap.get(src)) {
-            System.out.println("Label key for label " + labelKey + " "+ label + " " + src);
-            if (label != labelKey) {
-                otherHost.add(labelKey);
+        Index index = Engine.runAlgorithmOne(fileName, numOfLabels);
+
+        Set<Long> labels = new HashSet<>();
+        for(int i=0;i<numOfQueries;i++){
+            int randomLabelNum = rand.nextInt(Math.toIntExact(numOfLabels));
+            //while(labels.size() < (numOfLabels / 2)){
+            labels.add(Long.valueOf(randomLabelNum));
+            //}
+            System.out.println("Partations ==> " + labels);
+            Long src = Long.valueOf(rand.nextInt(Math.toIntExact(numOfVertices)));
+            while(index.getMinPr(src, labels) == Long.MAX_VALUE){
+                src = Long.valueOf(rand.nextInt(Math.toIntExact(numOfVertices)));
             }
+            Long dst = Long.valueOf(rand.nextInt(Math.toIntExact(numOfVertices)));
+            System.out.println("finding route between src ==> " +src + " target ==> " + dst + " in labels ==> " + labels);
+            Long cost = Engine.runAlgorithTwo(index, src, dst, labels);
+            if(cost == Long.MAX_VALUE){
+                System.out.println("Could not find route between src ==> " +src + " target ==> " + dst);
+            }else{
+                System.out.println("Found route between src ==> " +src + " target ==> " + dst + " in label ==> " + labels);
+                System.out.println("Finished cost is " + cost);
+            }
+            Long totalEntries = 0L;
+            for(long j=0; j< numOfLabels;j++){
+                totalEntries += index.getPartition(j).getCostSize();
+            }
+            System.out.println("There are " + totalEntries + " in Index");
+            Set<Long> a = new HashSet<>();
+            a.add(0L);
+            Long newCost = Engine.runAlgorithTwo(index, 1L, 9L,labels );
+            System.out.println(newCost);
+
+
         }
-        if (!otherHost.isEmpty()) {
-            bridge = true;
-        }
-        par.addVertex(src, bridge, otherHost);
-        System.out.println("Added vertex " + src + " to partition " + label + " with other hosts");
-        for(Long other: par.getVertex(src).getOtherHost()){
-            System.out.println(other);
-        }
+
     }
 }

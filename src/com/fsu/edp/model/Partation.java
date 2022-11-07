@@ -9,7 +9,6 @@ public class Partation {
     private Map<Long, Map<Long, Long>> cost = new HashMap<>();
 
     public boolean contains(Long vertex_id){
-        System.out.println(vertices);
         return vertices.containsKey(vertex_id);
     }
     public void addVertex(Long id, boolean isBridge, List<Long> otherHosts){
@@ -21,7 +20,12 @@ public class Partation {
     }
 
     public boolean isBridge(Long vertexId){
-        return vertices.get(vertexId).isBridge();
+        if(vertices.containsKey(vertexId)){
+            return vertices.get(vertexId).isBridge();
+        }else{
+            return false;
+        }
+
     }
 
     public Vertex getVertex(Long vertexId){
@@ -31,7 +35,12 @@ public class Partation {
         return vertices.get(vertexId).getEdges();
     }
     public boolean containsCost(Long src, Long dst){
-        return cost.get(src).containsKey(dst);
+        if(cost.containsKey(src)){
+            return cost.get(src).containsKey(dst);
+        }else{
+            return false;
+        }
+
     }
 
     public void addCost(Long src, Long dst, Long distance){

@@ -1,11 +1,11 @@
 package com.fsu.edp.model;
 
 public class Edge {
-    Long distance;
+    Long dst;
     Long weight;
 
-    public Edge(Long distance, Long weight){
-        this.distance = distance;
+    public Edge(Long dst, Long weight){
+        this.dst = dst;
         this.weight = weight;
     }
 
@@ -17,18 +17,18 @@ public class Edge {
         this.weight = weight;
     }
 
-    public long getDistance() {
-        return distance;
+    public long getDst() {
+        return dst;
     }
 
-    public void setDistance(Long distance) {
-        this.distance = distance;
+    public void setDst(Long dst) {
+        this.dst = dst;
     }
 
     @Override
     public String toString() {
         return "Edge{" +
-                "distance=" + distance +
+                "dst=" + dst +
                 ", weight=" + weight +
                 '}';
     }

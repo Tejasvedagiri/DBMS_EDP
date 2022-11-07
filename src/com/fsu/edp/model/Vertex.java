@@ -1,13 +1,14 @@
 package com.fsu.edp.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Vertex {
     private long id;
     private boolean bridge;
-    private List<Long> otherHost;
-    private List<Long> bridgeEdge;
-    private List<Edge> edges;
+    private List<Long> otherHost = new ArrayList<>();
+    private List<Long> bridgeEdge = new ArrayList<>();
+    private List<Edge> edges = new ArrayList<>();
 
     Vertex(long id, boolean bridge, List<Long> otherHost){
         this.id = id;
