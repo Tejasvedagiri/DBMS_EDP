@@ -13,16 +13,8 @@ public class Edge {
         return weight;
     }
 
-    public void setWeight(Long weight) {
-        this.weight = weight;
-    }
-
     public long getDst() {
         return dst;
-    }
-
-    public void setDst(Long dst) {
-        this.dst = dst;
     }
 
     @Override

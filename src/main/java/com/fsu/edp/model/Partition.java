@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Partation {
-    private Map<Long, Vertex> vertices = new HashMap<>();
-    private Map<Long, Map<Long, Long>> cost = new HashMap<>();
+public class Partition {
+    private final Map<Long, Vertex> vertices = new HashMap<>();
+    private final Map<Long, Map<Long, Long>> cost = new HashMap<>();
 
     public boolean contains(Long vertex_id){
         return vertices.containsKey(vertex_id);
@@ -44,7 +44,7 @@ public class Partation {
     }
 
     public void addCost(Long src, Long dst, Long distance){
-        Map<Long,Long> disCost = null;
+        Map<Long,Long> disCost;
         if(!cost.containsKey(src)){
             disCost= new HashMap<>();
         }else{

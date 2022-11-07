@@ -13,16 +13,8 @@ public class DistanceVertexPair {
         return distance;
     }
 
-    public void setDistance(Long distance) {
-        this.distance = distance;
-    }
-
     public Long getVertex() {
         return vertex;
-    }
-
-    public void setVertex(Long vertex) {
-        this.vertex = vertex;
     }
 
     @Override

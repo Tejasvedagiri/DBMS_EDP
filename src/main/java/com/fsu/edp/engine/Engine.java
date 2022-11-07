@@ -2,13 +2,17 @@ package com.fsu.edp.engine;
 
 import com.fsu.edp.model.*;
 import com.fsu.edp.utils.FileReaderUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Engine {
+    private static final Logger logger = LoggerFactory.getLogger(Engine.class);
 
     public static Index runAlgorithmOne(String inputPath, Long numberOfLabels){
+        logger.info("Creating a index map");
         Index index = new Index();
 
         Map<Long, Set<Long>> otherHostsMap = new HashMap<>();
@@ -18,7 +22,6 @@ public class Engine {
         List<Long> label = new ArrayList<>();
 
         FileReaderUtil.readFile(inputPath, src, dst, weight, label);
-
 
         for (Long i = 0L; i < numberOfLabels; ++i) {
             index.createPartition(i);
@@ -31,9 +34,9 @@ public class Engine {
             }
             otherHostsMap.get(src.get(i)).add(label.get(i));
         }
-        System.out.println("First Scan completed");
+        logger.info("First Scan completed");
         for (int i = 0; i < src.size(); i++) {
-            Partation par = index.getPartition(label.get(i));
+            Partition par = index.getPartition(label.get(i));
             Long cur_src = src.get(i);
             Long cur_dst = dst.get(i);
             Long cur_label = label.get(i);
@@ -48,12 +51,12 @@ public class Engine {
         }
         return index;
     }
-    private static void addVertex(Partation par, Long src, Long label, Map<Long, Set<Long>> otherHostsMap) {
+    private static void addVertex(Partition par, Long src, Long label, Map<Long, Set<Long>> otherHostsMap) {
         boolean bridge = false;
         List<Long> otherHost = new ArrayList<>();
         if(otherHostsMap.containsKey(src)) {
             for (Long labelKey : otherHostsMap.get(src)) {
-                if (label != labelKey) {
+                if (!Objects.equals(label, labelKey)) {
                     otherHost.add(labelKey);
                 }
             }
@@ -65,6 +68,7 @@ public class Engine {
     }
 
     public static Long runAlgorithTwo(Index index, Long src, Long dst, Set<Long> labels) {
+        logger.info("Running algorithm two from paper");
         Queue<PQElement> pqElementQueue = new ConcurrentLinkedQueue<>();
         Map<DistanceMap, Long> globalDistance = new HashMap<>();
         Long minPtr = index.getMinPr(src, labels);
@@ -83,14 +87,15 @@ public class Engine {
             if(cur_cost > globalDistance.get(key)){
                 continue;
             }
-            if(pqe.getDst() == dst){
+            if(Objects.equals(pqe.getDst(), dst)){
                 return  pqe.getCost();
             }
-//            if(pqe.getCost() == globalDistance.get(label).getSrcToDstDistance(src, cur_dst)){
+//            if(Objects.equals(pqe.getCost(), globalDistance.get(key))){
+//                logger.info("Found pre computed distance from Distance Map");
 //                return pqe.getCost();
 //            }
             if(!index.containsCost(cur_label, cur_dst, dst)){
-                Partation par = index.getPartition(cur_label);
+                Partition par = index.getPartition(cur_label);
                 Map<Long, Long> distances = new HashMap<>();
                 distances.put(cur_dst, 0L);
 
@@ -99,24 +104,19 @@ public class Engine {
 
                 while(!djQ.isEmpty()){
                     DistanceVertexPair v = djQ.remove();
-                    System.out.println("Internal: now visiting ==> "+ v.getVertex());
-//                    System.out.println(distances.containsKey(v.getVertex()));
-//                    System.out.println(v.getDistance() != distances.get(v.getVertex()));
-                    if(true){
-                        if(par.isBridge(v.getVertex()) && v.getVertex() != cur_dst){
-                            par.addCost(cur_dst, v.getVertex(), distances.get(v.getVertex()));
-                            par.getVertex(cur_dst).addBridgeEdge(v.getVertex());
-                        }else if(v.getVertex() == dst){
-                            par.addCost(cur_dst, v.getVertex(), distances.get(v.getVertex()));
+                    logger.debug("Visiting Node ==> {}", v.getVertex());
+                    if(par.isBridge(v.getVertex()) && !Objects.equals(v.getVertex(), cur_dst)){
+                        par.addCost(cur_dst, v.getVertex(), distances.get(v.getVertex()));
+                        par.getVertex(cur_dst).addBridgeEdge(v.getVertex());
+                    }else if(Objects.equals(v.getVertex(), dst)){
+                        par.addCost(cur_dst, v.getVertex(), distances.get(v.getVertex()));
+                    }
+                    for(Edge e: par.getEdge(v.getVertex())){
+                        Long newWeight = v.getDistance() + e.getWeight();
+                        if(!distances.containsKey(e.getDst()) || distances.get(e.getDst()) > newWeight ){
+                            distances.put(e.getDst(), newWeight);
+                            djQ.add(new DistanceVertexPair(newWeight, e.getDst()));
                         }
-                        for(Edge e: par.getEdge(v.getVertex())){
-                            Long newWeight = v.getDistance() + e.getWeight();
-                            if(!distances.containsKey(e.getDst()) || distances.get(e.getDst()) > newWeight ){
-                                distances.put(e.getDst(), newWeight);
-                                djQ.add(new DistanceVertexPair(newWeight, e.getDst()));
-                            }
-                        }
-
                     }
                 }
                 if(!distances.containsKey(dst)){
@@ -127,6 +127,7 @@ public class Engine {
             if(costToDistance != Long.MAX_VALUE){
                 insertIntoQueue(pqElementQueue, cur_label, dst, cur_cost + costToDistance, globalDistance);
             }
+            //Check other hosts
             for(Long bridge: index.getBridgeEdges(cur_label, cur_dst)){
                 Long costToBridge = index.getCost(cur_label, cur_dst, bridge);
                 for(Long otherHostLabels: index.getOtherHosts(cur_label, bridge)){

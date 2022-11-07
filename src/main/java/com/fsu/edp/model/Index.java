@@ -7,9 +7,9 @@ import java.util.Set;
 
 public class Index {
 
-    private Map<Long, Partation> partitions = new HashMap<>();
+    private final Map<Long, Partition> partitions = new HashMap<>();
 
-    public Partation getPartition(Long label){
+    public Partition getPartition(Long label){
         return partitions.get(label);
     }
     public List<Long> getOtherHosts(Long label, Long vertexId){
@@ -17,10 +17,10 @@ public class Index {
     }
     public Long getMinPr(Long src, Set<Long> labels){
         //TO-DO
-        Long min = Long.MAX_VALUE;
-        Long label = Long.MAX_VALUE;
+        long min = Long.MAX_VALUE;
+        long label = Long.MAX_VALUE;
         for (Long key: partitions.keySet()) {
-            Partation val = partitions.get(key);
+            Partition val = partitions.get(key);
             if(val.contains(src) && labels.contains(key)){
                 for(Edge edgeKey: val.getEdge(src)){
                     if(edgeKey.getWeight() < min){
@@ -39,7 +39,7 @@ public class Index {
         return partitions.get(label).getVertex(vertexId).isBridge();
     }
     public void createPartition(Long label){
-        partitions.put(label, new Partation());
+        partitions.put(label, new Partition());
     }
     public Long getCost(Long label, Long src, Long dst){
         return partitions.get(label).getCost(src, dst);

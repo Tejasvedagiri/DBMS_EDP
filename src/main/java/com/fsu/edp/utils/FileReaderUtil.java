@@ -1,14 +1,19 @@
 package com.fsu.edp.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 public class FileReaderUtil {
 
-    public static final void readFile(String fileName, List<Long> src, List<Long> dst, List<Long> weight, List<Long> label){
+    private static final Logger logger = LoggerFactory.getLogger(FileReaderUtil.class);
+
+    public static void readFile(String fileName, List<Long> src, List<Long> dst, List<Long> weight, List<Long> label){
+        logger.info("Reading from file ==> {}", fileName);
         try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
             stream.forEach(e -> {
                 String[] data = e.split(" ");
@@ -18,7 +23,11 @@ public class FileReaderUtil {
                 label.add(Long.valueOf(data[3]));
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to read file", e);
         }
+        logger.info("Read from file found count ==> {}", src.size());
+        logger.info("Unique Source Vertex ==> {}", src.stream().distinct().count());
+        logger.info("Unique Destination Vertex ==> {}", dst.stream().distinct().count());
+        logger.info("Total number of partitions found ==> {}", dst.stream().distinct().count());
     }
 }

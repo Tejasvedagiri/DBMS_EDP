@@ -1,14 +1,12 @@
 package com.fsu.edp.model;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 public class DistanceMap {
     Long label;
     Long dst;
 
-    private int hashCode;
+    private final int hashCode;
 
     public DistanceMap(Long label, Long dst) {
         this.label = label;
@@ -30,7 +28,7 @@ public class DistanceMap {
         if (o == null || getClass() != o.getClass())
             return false;
         DistanceMap that = (DistanceMap) o;
-        return label == that.label && dst == that.dst;
+        return Objects.equals(label, that.label) && Objects.equals(dst, that.dst);
     }
 
     @Override

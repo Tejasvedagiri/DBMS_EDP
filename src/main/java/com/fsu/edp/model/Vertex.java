@@ -4,20 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Vertex {
-    private long id;
-    private boolean bridge;
+    private final long id;
+    private final boolean bridge;
     private List<Long> otherHost = new ArrayList<>();
-    private List<Long> bridgeEdge = new ArrayList<>();
-    private List<Edge> edges = new ArrayList<>();
+    private final List<Long> bridgeEdge = new ArrayList<>();
+    private final List<Edge> edges = new ArrayList<>();
 
     Vertex(long id, boolean bridge, List<Long> otherHost){
         this.id = id;
         this.bridge = bridge;
         this.otherHost = otherHost;
-    }
-
-    public long getId() {
-        return id;
     }
 
     public boolean isBridge() {

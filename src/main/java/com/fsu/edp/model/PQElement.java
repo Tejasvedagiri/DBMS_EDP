@@ -15,24 +15,12 @@ public class PQElement {
         return label;
     }
 
-    public void setLabel(Long label) {
-        this.label = label;
-    }
-
     public Long getDst() {
         return dst;
     }
 
-    public void setDst(Long dst) {
-        this.dst = dst;
-    }
-
     public Long getCost() {
         return cost;
-    }
-
-    public void setCost(Long cost) {
-        this.cost = cost;
     }
 
     @Override
@@ -42,8 +30,5 @@ public class PQElement {
                 ", dst=" + dst +
                 ", cost=" + cost +
                 '}';
-    }
-    public boolean compare(PQElement pqe2){
-        return this.cost > pqe2.getCost();
     }
 }
