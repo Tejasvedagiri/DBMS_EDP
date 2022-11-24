@@ -38,7 +38,7 @@ public class App {
             }
             Long dst = (long) rand.nextInt(Math.toIntExact(numOfVertices));
             logger.info("Finding route between src ==> {} target ==> {} in labels ==> {}", src, dst, labels);
-            Long cost = Engine.runAlgorithTwo(index, src, dst, labels);
+            Long cost = Engine.runAlgorithmTwo(index, src, dst, labels);
             if(cost == Long.MAX_VALUE){
                 logger.info("Could not find route between src ==> {} target ==> {}", src, dst);
             }else{
@@ -49,7 +49,8 @@ public class App {
                 totalEntries += index.getPartition(j).getCostSize();
             }
             logger.info("Total number of entries in Index ==> {}", totalEntries);
-        }
 
+        }
+        System.out.println(Engine.runAlgorithmTwo(index, 1L, 9L, labels));
     }
 }

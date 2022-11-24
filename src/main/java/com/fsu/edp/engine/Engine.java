@@ -11,6 +11,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Engine {
     private static final Logger logger = LoggerFactory.getLogger(Engine.class);
 
+    /**
+     *
+     * @param inputPath : Contains the file path
+     * @param numberOfLabels: Number of clusters to be created
+     * @return : Index of partitions
+     * <p>
+     * Opens the file of the following format
+     * Vertex(S) Vertex(T) Distance Graph-ID/Label/Partition
+     *
+     * Returns an Index which contains the detailed graph
+     */
     public static Index runAlgorithmOne(String inputPath, Long numberOfLabels){
         logger.info("Creating a index map");
         Index index = new Index();
@@ -23,10 +34,12 @@ public class Engine {
 
         FileReaderUtil.readFile(inputPath, src, dst, weight, label);
 
+
+        //Create empty partitions
         for (Long i = 0L; i < numberOfLabels; ++i) {
             index.createPartition(i);
         }
-
+         //Checking and mapping if vertex exists in other hosts
         for (int i = 0; i < src.size(); i++) {
             if (!otherHostsMap.containsKey(src.get(i))) {
                 Set<Long> hostMap = new HashSet<>();
@@ -34,7 +47,8 @@ public class Engine {
             }
             otherHostsMap.get(src.get(i)).add(label.get(i));
         }
-        logger.info("First Scan completed");
+        logger.info("Creating Graph");
+        //Creating Graph
         for (int i = 0; i < src.size(); i++) {
             Partition par = index.getPartition(label.get(i));
             Long cur_src = src.get(i);
@@ -51,6 +65,14 @@ public class Engine {
         }
         return index;
     }
+
+    /**
+     *
+     * @param par : Partitions of the graph or labels
+     * @param src: Source vertex
+     * @param label: Partitions to be used
+     * @param otherHostsMap: Other graphs to search on
+     */
     private static void addVertex(Partition par, Long src, Long label, Map<Long, Set<Long>> otherHostsMap) {
         boolean bridge = false;
         List<Long> otherHost = new ArrayList<>();
@@ -67,8 +89,20 @@ public class Engine {
         par.addVertex(src, bridge, otherHost);
     }
 
-    public static Long runAlgorithTwo(Index index, Long src, Long dst, Set<Long> labels) {
+    /**
+     *
+     * @param index: Initial index to start the search from
+     * @param src: Source vertex
+     * @param dst: Target vertex
+     * @param labels: Partitions to use for search
+     * @return:  Cost of Source to Target
+     * <p>
+     * Implementation of paper. Checks if shorts path existing in index if not calculate the shortest path using Dijkstra algorithm.
+     * Save the distance in path. Check vertex is found in other nodes if true check other partitions.
+     */
+    public static Long runAlgorithmTwo(Index index, Long src, Long dst, Set<Long> labels) {
         logger.info("Running algorithm two from paper");
+        logger.info("Creating an empty queue which holds all the paths that is not traversed");
         Queue<PQElement> pqElementQueue = new ConcurrentLinkedQueue<>();
         Map<DistanceMap, Long> globalDistance = new HashMap<>();
         Long minPtr = index.getMinPr(src, labels);
