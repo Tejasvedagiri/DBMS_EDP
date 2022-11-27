@@ -101,8 +101,8 @@ public class Engine {
      * Save the distance in path. Check vertex is found in other nodes if true check other partitions.
      */
     public static Long runAlgorithmTwo(Index index, Long src, Long dst, Set<Long> labels) {
-        logger.info("Running algorithm two from paper");
-        logger.info("Creating an empty queue which holds all the paths that is not traversed");
+        logger.debug("Running algorithm two from paper");
+        logger.debug("Creating an empty queue which holds all the paths that is not traversed");
         Queue<PQElement> pqElementQueue = new ConcurrentLinkedQueue<>();
         Map<DistanceMap, Long> globalDistance = new HashMap<>();
         Long minPtr = index.getMinPr(src, labels);
@@ -138,7 +138,7 @@ public class Engine {
 
                 while(!djQ.isEmpty()){
                     DistanceVertexPair v = djQ.remove();
-                    logger.debug("Visiting Node ==> {}", v.getVertex());
+                    //logger.debug("Visiting Node ==> {}", v.getVertex());
                     if(par.isBridge(v.getVertex()) && !Objects.equals(v.getVertex(), cur_dst)){
                         par.addCost(cur_dst, v.getVertex(), distances.get(v.getVertex()));
                         par.getVertex(cur_dst).addBridgeEdge(v.getVertex());
