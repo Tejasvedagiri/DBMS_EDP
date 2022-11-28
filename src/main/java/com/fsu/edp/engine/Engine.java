@@ -110,8 +110,13 @@ public class Engine {
             return Long.MAX_VALUE;
         }
         insertIntoQueue(pqElementQueue, minPtr, src, 0L, globalDistance);
-
+        int counter = 0;
         while(!pqElementQueue.isEmpty()){
+            counter += 1;
+            if(counter % 1000 == 0 ){
+                logger.info("Current queue size ==> {}",pqElementQueue.size());
+            }
+
             PQElement pqe = pqElementQueue.remove();
 
             Long cur_label = pqe.getLabel();
