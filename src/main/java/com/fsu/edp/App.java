@@ -26,12 +26,15 @@ public class App {
         if(args.length > 4){
             finalSrc = Long.parseLong(args[4]);
             finalDst = Long.parseLong(args[5]);
-            logger.info("To find distance between src ==> {} and target ==> {}", finalSrc, finalDst);
-
         }
+        long numOfLabelsToCreate = numOfLabels / 2;
+        if(args.length > 5){
+            numOfLabelsToCreate = Long.parseLong(args[6]);
+        }
+        logger.info("Max number of Partitions to be used ==> {}", numOfLabelsToCreate);
         logger.info("To find distance between src ==> {} and target ==> {}", finalSrc, finalDst);
-        logger.info("Starting program in 10 seconds");
-        Thread.sleep(10000);
+        logger.info("Starting program in 5 seconds");
+        Thread.sleep(5000);
         Random rand = new Random();
 
         logger.info("Running AlgorithmOne from paper");
@@ -40,7 +43,7 @@ public class App {
         Set<Long> labels = new HashSet<>();
         long startTime = System.currentTimeMillis();
         for(int i=0;i<numOfQueries;i++){
-            if(labels.size() < (numOfLabels/2) ){
+            if(labels.size() < numOfLabelsToCreate ){
                 int randomLabelNum = rand.nextInt(Math.toIntExact(numOfLabels));
                 labels.add((long) randomLabelNum);
             }
