@@ -1,5 +1,8 @@
 package com.fsu.edp.model;
 
+/**
+ * Reverse mapping used for distance lookup in Dijkstra algorithm
+ */
 public class DistanceVertexPair {
     Long distance;
     Long vertex;

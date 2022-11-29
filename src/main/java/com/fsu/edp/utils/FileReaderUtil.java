@@ -12,6 +12,14 @@ public class FileReaderUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(FileReaderUtil.class);
 
+    /**
+     *
+     * @param fileName - Path of file
+     * @param src - List to store source node
+     * @param dst - List to store destination node
+     * @param weight - List to store weight
+     * @param label - List to hold partition
+     */
     public static void readFile(String fileName, List<Long> src, List<Long> dst, List<Long> weight, List<Long> label){
         logger.info("Reading from file ==> {}", fileName);
         try (Stream<String> stream = Files.lines(Paths.get(fileName))) {

@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Core algorithm from the paper
+ */
 public class Engine {
     private static final Logger logger = LoggerFactory.getLogger(Engine.class);
 
@@ -129,10 +132,6 @@ public class Engine {
             if(Objects.equals(pqe.getDst(), dst)){
                 return  pqe.getCost();
             }
-//            if(Objects.equals(pqe.getCost(), globalDistance.get(key))){
-//                logger.info("Found pre computed distance from Distance Map");
-//                return pqe.getCost();
-//            }
             if(!index.containsCost(cur_label, cur_dst, dst)){
                 Partition par = index.getPartition(cur_label);
                 Map<Long, Long> distances = new HashMap<>();
@@ -142,8 +141,8 @@ public class Engine {
                 djQ.add(new DistanceVertexPair(0L, cur_dst));
 
                 while(!djQ.isEmpty()){
+                    //Running Dijkstra algorithm
                     DistanceVertexPair v = djQ.remove();
-                    //logger.debug("Visiting Node ==> {}", v.getVertex());
                     if(par.isBridge(v.getVertex()) && !Objects.equals(v.getVertex(), cur_dst)){
                         par.addCost(cur_dst, v.getVertex(), distances.get(v.getVertex()));
                         par.getVertex(cur_dst).addBridgeEdge(v.getVertex());
@@ -166,7 +165,7 @@ public class Engine {
             if(costToDistance != Long.MAX_VALUE){
                 insertIntoQueue(pqElementQueue, cur_label, dst, cur_cost + costToDistance, globalDistance);
             }
-            //Check other hosts
+            //Get bridge and cost is less to next node re calculate the bridge
             for(Long bridge: index.getBridgeEdges(cur_label, cur_dst)){
                 Long costToBridge = index.getCost(cur_label, cur_dst, bridge);
                 for(Long otherHostLabels: index.getOtherHosts(cur_label, bridge)){
@@ -175,6 +174,7 @@ public class Engine {
                     }
                 }
             }
+            //Check other hosts if true and to queue
             if(index.isBridge(cur_label, cur_dst)){
                 for(Long otherLabel: index.getOtherHosts(cur_label, cur_dst)){
                     if(labels.contains(otherLabel)){

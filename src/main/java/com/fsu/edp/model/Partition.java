@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * For every partition the exits it holds the respective nodes and the cost between multiple vertices.
+ */
 public class Partition {
     private final Map<Long, Vertex> vertices = new HashMap<>();
     private final Map<Long, Map<Long, Long>> cost = new HashMap<>();

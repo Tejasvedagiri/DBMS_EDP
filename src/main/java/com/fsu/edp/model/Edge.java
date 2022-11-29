@@ -1,5 +1,8 @@
 package com.fsu.edp.model;
 
+/**
+ * Holds the Edge of a vertex. Forever vertex it contains an edge to a difference vertex with its respective weights.
+ */
 public class Edge {
     Long dst;
     Long weight;

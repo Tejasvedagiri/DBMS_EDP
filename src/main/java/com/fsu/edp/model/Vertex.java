@@ -3,6 +3,9 @@ package com.fsu.edp.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The following class holds the information about the vertices
+ */
 public class Vertex {
     private final long id;
     private final boolean bridge;

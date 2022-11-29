@@ -2,6 +2,9 @@ package com.fsu.edp.model;
 
 import java.util.Objects;
 
+/**
+ * Key hashing used for revers lookup
+ */
 public class DistanceMap {
     Long label;
     Long dst;

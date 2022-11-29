@@ -48,6 +48,7 @@ public class App {
                 labels.add((long) randomLabelNum);
             }
             logger.info("Loaded partition ==> {}", labels);
+            // Select a random Source and Target to simulate user Query
             Long src = (long) rand.nextInt(Math.toIntExact(numOfVertices));
             Long dst = (long) rand.nextInt(Math.toIntExact(numOfVertices));
             logger.info("Finding route between src ==> {} target ==> {}", src, dst);

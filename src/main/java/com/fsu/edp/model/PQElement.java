@@ -1,5 +1,8 @@
 package com.fsu.edp.model;
 
+/**
+ * Queuing system used for Dijkstra algorithm.
+ */
 public class PQElement {
     Long label;
     Long dst;
