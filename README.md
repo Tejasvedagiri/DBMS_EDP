@@ -2,6 +2,8 @@
 
 Create sub-graphs and generate the shortest path for a graph
 
+## Archive file
+https://drive.google.com/drive/folders/1IP4jUSxVdIVl4-gu5jlJdTo6NwGn0kTD?usp=sharing
 ## Repository
 
 https://github.com/Tejasvedagiri/DBMS_EDP
@@ -37,13 +39,13 @@ maven clean install
     * enter the arguments
 
 ```
-  ARGS1 --File Path           		Local File path (dataset)
-  ARGS2 --No. of partitions   		Number of label partitions 
-  ARGS3 --Unique vertex count 		##
-  ARGS4 --No. of queries to be executed       ##
-  ARGS5 --Source node id (optional)		##
-  ARGS6 --Target node id (optional)		##
-  ARGS7 --Index partitions size      
+  ARGS1 --File Path           		    Local File path (dataset)   Integer
+  ARGS2 --No. of partitions   		    Number of label partitions  Integer
+  ARGS3 --Unique vertex count 		    ##                          Integer
+  ARGS4 --No. of queries to be executed     ##                          Integer
+  ARGS5 --Source node id (optional)         ##                          Integer
+  ARGS6 --Target node id (optional)         ##                          Integer
+  ARGS7 --Index partitions size             ##                          Integer
 ```
 
 ## End to end Run
