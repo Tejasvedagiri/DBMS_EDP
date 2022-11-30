@@ -32,10 +32,11 @@ public class FileReaderUtil {
             });
         } catch (Exception e) {
             logger.error("Failed to read file", e);
+
         }
         logger.info("Read from file found count ==> {}", src.size());
         logger.info("Unique Source Vertex ==> {}", src.stream().distinct().count());
         logger.info("Unique Destination Vertex ==> {}", dst.stream().distinct().count());
-        logger.info("Total number of partitions found ==> {}", dst.stream().distinct().count());
+        logger.info("Total number of partitions found ==> {}", label.stream().distinct().count());
     }
 }
