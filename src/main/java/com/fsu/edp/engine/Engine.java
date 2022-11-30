@@ -114,10 +114,10 @@ public class Engine {
         }
         insertIntoQueue(pqElementQueue, minPtr, src, 0L, globalDistance);
         int counter = 0;
-        while(!pqElementQueue.isEmpty()){
+        while(!pqElementQueue.isEmpty()) {
             counter += 1;
-            if(counter % 1000 == 0 ){
-                logger.info("Current queue size ==> {}",pqElementQueue.size());
+            if (counter % 1000 == 0) {
+                logger.info("Current queue size ==> {}", pqElementQueue.size());
             }
 
             PQElement pqe = pqElementQueue.remove();
@@ -126,62 +126,65 @@ public class Engine {
             Long cur_dst = pqe.getDst();
             Long cur_cost = pqe.getCost();
             DistanceMap key = new DistanceMap(cur_label, cur_dst);
-            if(cur_cost > globalDistance.get(key)){
-                continue;
-            }
-            if(Objects.equals(pqe.getDst(), dst)){
-                return  pqe.getCost();
-            }
-            if(!index.containsCost(cur_label, cur_dst, dst)){
-                Partition par = index.getPartition(cur_label);
-                Map<Long, Long> distances = new HashMap<>();
-                distances.put(cur_dst, 0L);
 
-                Queue<DistanceVertexPair> djQ = new ConcurrentLinkedQueue<>();
-                djQ.add(new DistanceVertexPair(0L, cur_dst));
+            if (globalDistance.containsKey(key) && globalDistance.get(key) != cur_dst) {
+                if (cur_cost < globalDistance.get(key)) {
+                    break;
+                }
+                if (Objects.equals(pqe.getDst(), dst)) {
+                    return pqe.getCost();
+                }
+                if (!index.containsCost(cur_label, cur_dst, dst)) {
+                    Partition par = index.getPartition(cur_label);
+                    Map<Long, Long> distances = new HashMap<>();
+                    distances.put(cur_dst, 0L);
 
-                while(!djQ.isEmpty()){
-                    //Running Dijkstra algorithm
-                    DistanceVertexPair v = djQ.remove();
-                    if(par.isBridge(v.getVertex()) && !Objects.equals(v.getVertex(), cur_dst)){
-                        par.addCost(cur_dst, v.getVertex(), distances.get(v.getVertex()));
-                        par.getVertex(cur_dst).addBridgeEdge(v.getVertex());
-                    }else if(Objects.equals(v.getVertex(), dst)){
-                        par.addCost(cur_dst, v.getVertex(), distances.get(v.getVertex()));
+                    Queue<DistanceVertexPair> djQ = new ConcurrentLinkedQueue<>();
+                    djQ.add(new DistanceVertexPair(0L, cur_dst));
+
+                    while (!djQ.isEmpty()) {
+                        //Running Dijkstra algorithm
+                        DistanceVertexPair v = djQ.remove();
+                        if (par.isBridge(v.getVertex()) && !Objects.equals(v.getVertex(), cur_dst)) {
+                            par.addCost(cur_dst, v.getVertex(), distances.get(v.getVertex()));
+                            par.getVertex(cur_dst).addBridgeEdge(v.getVertex());
+                        } else if (Objects.equals(v.getVertex(), dst)) {
+                            par.addCost(cur_dst, v.getVertex(), distances.get(v.getVertex()));
+                        }
+                        for (Edge e : par.getEdge(v.getVertex())) {
+                            Long newWeight = v.getDistance() + e.getWeight();
+                            if (!distances.containsKey(e.getDst()) || distances.get(e.getDst()) > newWeight) {
+                                distances.put(e.getDst(), newWeight);
+                                djQ.add(new DistanceVertexPair(newWeight, e.getDst()));
+                            }
+                        }
                     }
-                    for(Edge e: par.getEdge(v.getVertex())){
-                        Long newWeight = v.getDistance() + e.getWeight();
-                        if(!distances.containsKey(e.getDst()) || distances.get(e.getDst()) > newWeight ){
-                            distances.put(e.getDst(), newWeight);
-                            djQ.add(new DistanceVertexPair(newWeight, e.getDst()));
+                    if (!distances.containsKey(dst)) {
+                        par.addCost(cur_dst, dst, Long.MAX_VALUE);
+                    }
+                }
+                Long costToDistance = index.getCost(cur_label, cur_dst, dst);
+                if (costToDistance != Long.MAX_VALUE) {
+                    insertIntoQueue(pqElementQueue, cur_label, dst, cur_cost + costToDistance, globalDistance);
+                }
+                //Get bridge and cost is less to next node re calculate the bridge
+                for (Long bridge : index.getBridgeEdges(cur_label, cur_dst)) {
+                    Long costToBridge = index.getCost(cur_label, cur_dst, bridge);
+                    for (Long otherHostLabels : index.getOtherHosts(cur_label, bridge)) {
+                        if (labels.contains(otherHostLabels)) {
+                            insertIntoQueue(pqElementQueue, otherHostLabels, bridge, cur_cost + costToBridge, globalDistance);
                         }
                     }
                 }
-                if(!distances.containsKey(dst)){
-                    par.addCost(cur_dst, dst, Long.MAX_VALUE);
-                }
-            }
-            Long costToDistance = index.getCost(cur_label, cur_dst, dst);
-            if(costToDistance != Long.MAX_VALUE){
-                insertIntoQueue(pqElementQueue, cur_label, dst, cur_cost + costToDistance, globalDistance);
-            }
-            //Get bridge and cost is less to next node re calculate the bridge
-            for(Long bridge: index.getBridgeEdges(cur_label, cur_dst)){
-                Long costToBridge = index.getCost(cur_label, cur_dst, bridge);
-                for(Long otherHostLabels: index.getOtherHosts(cur_label, bridge)){
-                    if(labels.contains(otherHostLabels)){
-                        insertIntoQueue(pqElementQueue, otherHostLabels, bridge, cur_cost+costToBridge, globalDistance);
+                //Check other hosts if true and to queue
+                if (index.isBridge(cur_label, cur_dst)) {
+                    for (Long otherLabel : index.getOtherHosts(cur_label, cur_dst)) {
+                        if (labels.contains(otherLabel)) {
+                            insertIntoQueue(pqElementQueue, otherLabel, cur_dst, cur_cost, globalDistance);
+                        }
                     }
-                }
-            }
-            //Check other hosts if true and to queue
-            if(index.isBridge(cur_label, cur_dst)){
-                for(Long otherLabel: index.getOtherHosts(cur_label, cur_dst)){
-                    if(labels.contains(otherLabel)){
-                        insertIntoQueue(pqElementQueue, otherLabel, cur_dst, cur_cost, globalDistance);
-                    }
-                }
 
+                }
             }
         }
 
