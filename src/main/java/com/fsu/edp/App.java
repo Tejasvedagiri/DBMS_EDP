@@ -51,7 +51,7 @@ public class App {
             // Select a random Source and Target to simulate user Query
             Long src = (long) rand.nextInt(Math.toIntExact(numOfVertices));
             Long dst = (long) rand.nextInt(Math.toIntExact(numOfVertices));
-            logger.info("Finding route between src ==> {} target ==> {}", src, dst);
+            logger.info("Finding route between src ==> {} target ==> {} Executing Query no ==> {}", src, dst, i);
             Long cost = Engine.runAlgorithmTwo(index, src, dst, labels);
             Utils.checkCostAndPrint(cost, src, dst);
             long totalEntries = 0L;
